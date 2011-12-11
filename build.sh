@@ -1,3 +1,2 @@
 #!/bin/bash
-mvn clean install
-mvn clojure:repl
+mvn clean install && mvn clojure:repl
