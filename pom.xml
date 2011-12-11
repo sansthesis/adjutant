@@ -174,9 +174,28 @@
                 <goal>compile</goal>
               </goals>
             </execution>
+            <execution>
+              <id>test-clojure</id>
+              <phase>test</phase>
+              <goals>
+                <goal>test</goal>
+              </goals>
+            </execution>
           </executions>
+          <configuration>
+            <sourceDirectories>
+              <sourceDirectory>src/main/clojure</sourceDirectory>
+            </sourceDirectories>
+            <testSourceDirectories>
+              <testSourceDirectory>src/test/clojure</testSourceDirectory>
+            </testSourceDirectories>
+            <copyAllCompiledNamespaces>true</copyAllCompiledNamespaces>
+            <temporaryOutputDirectory>true</temporaryOutputDirectory>
+            <replScript>src/main/clojure/Repl.clj</replScript>
+          </configuration>
         </plugin>
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+        <!--This plugin's configuration is used to store Eclipse m2e settings 
+          only. It has no influence on the Maven build itself. -->
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
           <artifactId>lifecycle-mapping</artifactId>
