@@ -9,4 +9,5 @@
   :main adjutant.server
   :repl-init adjutant.server
   :dependencies [[org.clojure/clojure "1.3.0"]
-                 [noir "1.2.1"]])
+                 [noir "1.2.1"]
+                 [com.amazonaws/aws-java-sdk "1.3.2"]])
