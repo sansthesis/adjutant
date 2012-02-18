@@ -10,4 +10,6 @@
       (string/replace ((request/ring-request) :scheme) #":" "")
       "://"
       ((:headers (request/ring-request)) "host")
-      uri)))
+      (if (= (first uri) \/)
+        uri
+        (str \/ uri)))))
