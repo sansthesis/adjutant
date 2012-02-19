@@ -14,34 +14,40 @@
 
 (def credentials (load-credentials))
 
-(def endpoint-map { :us-west-1 
+(def endpoint-map { :us-east-1 
                    { :cloudformation "cloudformation.us-east-1.amazonaws.com"}})
 
-(defn list-stacks 
-  ([region] 
-    (map mapify-stack
-      (-> 
-        (doto 
-          (AmazonCloudFormationClient. credentials)
-          (.setEndpoint ((endpoint-map region) :cloudformation)))
-        (.describeStacks)
-        (.getStacks))))
-  ([] (list-stacks :us-west-1)))
+(defn get-cloudformation-client
+  ([region]
+    (doto (AmazonCloudFormationClient. credentials)
+      (.setEndpoint ((endpoint-map region) :cloudformation))))
+  ([] (get-cloudformation-client :us-east-1)))
 
-(defn mapify-stack
-  [s]
-  (->
-    (bean s)
-    (update-in [:parameters] 
-               (fn [x] 
-                 (apply merge 
-                        (map 
-                          (fn [y] { (keyword (:parameterKey y)) (:parameterValue y)}) 
-                          (map bean x)))))
-    (update-in [:outputs] 
-               (fn [x]
-                 (apply merge 
-                        (map 
-                          (fn [y] { (keyword (:outputKey y)) (:outputValue y)}) 
-                          (map bean x)))))))
+;(defn list-stacks 
+;  ([region] 
+;    (map mapify-stack
+;      (-> 
+;        (doto 
+;          (AmazonCloudFormationClient. credentials)
+;          (.setEndpoint ((endpoint-map region) :cloudformation)))
+;        (.describeStacks)
+;        (.getStacks))))
+;  ([] (list-stacks :us-west-1)))
+
+;(defn mapify-stack
+;  [s]
+;  (->
+;    (bean s)
+;    (update-in [:parameters] 
+;               (fn [x] 
+;                 (apply merge 
+;                        (map 
+;                          (fn [y] { (keyword (:parameterKey y)) (:parameterValue y)}) 
+;                          (map bean x)))))
+;    (update-in [:outputs] 
+;               (fn [x]
+;                 (apply merge 
+;                        (map 
+;                          (fn [y] { (keyword (:outputKey y)) (:outputValue y)}) 
+;                          (map bean x)))))))
   

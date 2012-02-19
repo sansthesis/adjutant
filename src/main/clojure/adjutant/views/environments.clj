@@ -1,5 +1,7 @@
 (ns adjutant.views.environments
   (:use noir.core)
+  (:use [ring.util.codec :only [url-encode url-decode base64-encode base64-decode]])
+  (:import [java.net URLDecoder URLEncoder])
   (:require [noir.response :as response]
             [adjutant.views.common :as common]
             [adjutant.services.services :as services]
@@ -16,7 +18,7 @@
                              (map convert-into-link (services/list-environments)))}))
 
 (defpage "/environments/:id" {:keys [id]}
-  (let [environment (services/get-environment id)]
+  (let [environment (services/get-environment (String. (base64-decode id)))]
     (if (nil? environment)
       (views/not-found)
       (response/json {:links [(links/generate-environment-link (:id environment) "self" (:name environment))

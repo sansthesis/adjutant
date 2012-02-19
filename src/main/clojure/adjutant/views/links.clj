@@ -1,6 +1,8 @@
 (ns adjutant.views.links
   (:use noir.core)
-  (:require [adjutant.views.common :as common]))
+  (:use [ring.util.codec :only [url-encode url-decode base64-encode base64-decode]] )
+  (:require [adjutant.views.common :as common])
+  (:import [java.net URLEncoder]))
 
 (defn- remove-null-values
   [record] (into {} (remove (comp nil? second) record)))
@@ -19,4 +21,4 @@
 (defn generate-environment-link
   ([id] (generate-environment-link id "environment"))
   ([id rel] (generate-environment-link id rel nil))
-  ([id rel title] (generate-link :href (common/full-url-for (str "/environments/" id)) :rel rel :type "application/json" :title title)))
+  ([id rel title] (generate-link :href (common/full-url-for (str "/environments/" (base64-encode (.getBytes id)))) :rel rel :type "application/json" :title title)))
