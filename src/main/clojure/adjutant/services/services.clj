@@ -1,6 +1,7 @@
 (ns adjutant.services.services
   (:import [com.amazonaws.services.cloudformation.model DescribeStacksRequest])
-  (:use adjutant.aws))
+  (:use adjutant.aws)
+  (:use clojure.set))
 
 (defn make-environment-fixture
   [id] {:id id
@@ -10,14 +11,17 @@
 
 (defn stack-to-env
   [s]
-  {:id (.getStackId s)
-   :name (.getStackName s)
-   :description (.getDescription s)
-   :environment-type (or (first 
-                           (map (fn [o] (.getOutputValue o))
-                                (filter (fn [x] (= (.getOutputKey x) "ProvisioningGroup")) 
-                                        (.getOutputs s)))) 
-                         "Development")})
+  (->
+    (bean s)
+    (select-keys [:stackId :stackName :description :stackStatus])
+    (rename-keys {:stackId :id, :stackName :name, :stackStatus :status})
+    (assoc 
+      :environment-type
+      (or (first 
+            (map (fn [o] (.getOutputValue o)) 
+                 (filter (fn [x] (= (.getOutputKey x) "ProvisioningGroup")) 
+                         (.getOutputs s))))
+          "Development"))))
 
 ;;(defn list-environments
 ;;  [] (take 10 (map make-environment-fixture (range))))
