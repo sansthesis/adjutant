@@ -1,9 +1,9 @@
 (ns adjutant.views.root
   (:use noir.core)
-  (:require [noir.response :as response]))
+  (:require [noir.response :as response]
+            [adjutant.views.links :as links]))
 
 (defpage "/"
   [] (response/json {:links [
-                             {:href "/"
-                              :rel "root"
-                              :type "application/json"}]}))
+                             (links/generate-root-link "self")
+                             (links/generate-environments-link)]}))
