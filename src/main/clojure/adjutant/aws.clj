@@ -2,9 +2,10 @@
   (:use noir.core)
   (:use clojure.java.io)
   (:require clojure.stacktrace)
-  (:import [com.amazonaws.auth AWSCredentials PropertiesCredentials BasicAWSCredentials])
-  (:import [java.util Properties])
-  (:import [com.amazonaws.services.cloudformation AmazonCloudFormation AmazonCloudFormationClient]))
+  (:import 
+    [com.amazonaws.auth AWSCredentials PropertiesCredentials BasicAWSCredentials]
+    [java.util Properties]
+    [com.amazonaws.services.cloudformation AmazonCloudFormation AmazonCloudFormationClient]))
 
 (defn- load-credentials
   []
@@ -18,10 +19,29 @@
 
 (defn list-stacks 
   ([region] 
-    (-> 
-      (doto 
-        (AmazonCloudFormationClient. credentials)
-        (.setEndpoint ((endpoint-map region) :cloudformation)))
-      (.describeStacks)
-      (.getStacks)))
+    (map mapify-stack
+      (-> 
+        (doto 
+          (AmazonCloudFormationClient. credentials)
+          (.setEndpoint ((endpoint-map region) :cloudformation)))
+        (.describeStacks)
+        (.getStacks))))
   ([] (list-stacks :us-west-1)))
+
+(defn mapify-stack
+  [s]
+  (->
+    (bean s)
+    (update-in [:parameters] 
+               (fn [x] 
+                 (apply merge 
+                        (map 
+                          (fn [y] { (keyword (:parameterKey y)) (:parameterValue y)}) 
+                          (map bean x)))))
+    (update-in [:outputs] 
+               (fn [x]
+                 (apply merge 
+                        (map 
+                          (fn [y] { (keyword (:outputKey y)) (:outputValue y)}) 
+                          (map bean x)))))))
+  
