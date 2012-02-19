@@ -21,8 +21,7 @@
   (let [environment (services/get-environment (String. (base64-decode id)))]
     (if (nil? environment)
       (views/not-found)
-      (response/json {:links [(links/generate-environment-link (:id environment) "self" (:name environment))
-                              (links/generate-environments-link)]
-                      :name (:name environment)
-                      :description (:description environment)
-                      :environment-type (:environment-type environment)}))))
+      (response/json (assoc
+                       (dissoc environment :id)
+                       :links [(links/generate-environment-link (:id environment) "self" (:name environment)) 
+                               (links/generate-environments-link)])))))
